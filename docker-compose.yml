@@ -1,0 +1,135 @@
+# Cleaned Docker Compose for N8N + Evolution Platform
+# Core services only - no Tailscale proxies
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  # N8N volumes
+  n8n-data:
+  n8n-redis:
+
+  # MinIO volumes
+  minio-data:
+
+  # Evolution API volumes
+  evolution-instances:
+  evolution-postgres:
+  evolution-redis:
+
+services:
+  # ========================================
+  # N8N WORKFLOW AUTOMATION
+  # ========================================
+
+  n8n-core:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n-core
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678
+      - N8N_EDITOR_BASE_URL=http://localhost:5678
+      - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE:-false}
+      # Enable public API
+      - N8N_PUBLIC_API_DISABLED=false
+      # Allow parallel execution - up to 10 concurrent workflows
+      - N8N_CONCURRENCY_PRODUCTION_LIMIT=10
+      # Performance and limits configuration
+      # RAM Requirements: ~16x payload size is needed because n8n requires memory for:
+      # 1. Original payload data (4GB)
+      # 2. Data duplication between workflow nodes (n8n copies data for each node)
+      # 3. JSON parsing/serialization overhead (can double memory usage)
+      # 4. V8 garbage collection requires 2-3x working memory
+      # 5. Execution context and variables for each workflow node
+      # 6. Frontend copies for manual executions in the UI
+      # Total: 4GB payload × 16 = 64GB RAM minimum, we allocate 64GB heap + system needs 128GB total
+      - EXECUTIONS_TIMEOUT=30  # 30 seconds timeout - kills long-running workflows
+      - N8N_PAYLOAD_SIZE_MAX=4294967296  # 4GB payload limit (4,294,967,296 bytes)
+      - NODE_OPTIONS=--max-old-space-size=65536  # 64GB heap (65,536 MB) for processing 4GB payloads
+      - N8N_REQUEST_SIZE_MAX=4294967296  # Match request body limit to payload limit
+    volumes:
+      - n8n-data:/home/node/.n8n
+    ports:
+      - "5678:5678"
+
+  n8n-redis:
+    image: redis:7-alpine
+    container_name: n8n-redis
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - n8n-redis:/data
+
+  # ========================================
+  # MINIO OBJECT STORAGE
+  # ========================================
+
+  minio-core:
+    image: minio/minio:latest
+    container_name: minio-core
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"  # MinIO API
+      - "9001:9001"  # MinIO Console
+
+  # ========================================
+  # EVOLUTION API (WHATSAPP)
+  # ========================================
+
+  evolution-postgres:
+    image: postgres:15-alpine
+    container_name: evolution-postgres
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: evolution_pass
+      POSTGRES_DB: evolution
+    volumes:
+      - evolution-postgres:/var/lib/postgresql/data
+
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: evolution-redis
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - evolution-redis:/data
+
+  evolution-api-core:
+    image: evoapicloud/evolution-api:latest
+    container_name: evolution-api-core
+    restart: unless-stopped
+    networks:
+      - internal
+    env_file:
+      - .env.evolution
+    volumes:
+      - evolution-instances:/evolution/instances
+    depends_on:
+      - evolution-postgres
+      - evolution-redis
+    ports:
+      - "8080:8080"
