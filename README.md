@@ -11,6 +11,7 @@ A complete Docker-based integration template for building WhatsApp automation wo
 - [Configuration](#configuration)
 - [Service URLs](#service-urls)
 - [Connecting Evolution API to N8N](#connecting-evolution-api-to-n8n)
+- [Example Workflows](#example-workflows)
 - [Common Tasks](#common-tasks)
 - [Troubleshooting](#troubleshooting)
 - [Documentation Links](#documentation-links)
@@ -222,6 +223,29 @@ curl -X POST http://localhost:8080/webhook/set/my-whatsapp-bot \
 ### Step 4: Test the Integration
 
 Send a WhatsApp message to your connected number and check the N8N workflow execution!
+
+## Example Workflows
+
+This repository includes ready-to-use N8N workflow examples in the `workflows/` directory:
+
+### Welcome Message on Group Join
+
+Automatically welcomes new members when they join a WhatsApp group with a random message and participant count.
+
+**Import to N8N:**
+1. Go to http://localhost:5678
+2. Click "Add workflow" → "Import from File"
+3. Select `workflows/welcome-message-on-group-join.json`
+4. Update credentials and group settings
+5. Activate the workflow
+
+**Features:**
+- 20 random welcome messages in Portuguese
+- Shows current participant count
+- Filters by specific group and instance
+- Uses Evolution API webhook events
+
+See `workflows/README.md` for detailed documentation and more examples.
 
 ## Common Tasks
 

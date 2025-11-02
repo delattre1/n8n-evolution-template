@@ -1,0 +1,38 @@
+[
+    {
+        "headers": {
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "user-agent": "axios/1.12.2",
+            "content-length": "497",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "host": "n8n-core:5678",
+            "connection": "keep-alive"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+            "event": "group-participants.update",
+            "instance": "+11967308190",
+            "data": {
+                "id": "120363405226577317@g.us",
+                "author": "231709727543501@lid",
+                "participants": [
+                    {
+                        "id": "211102558335111@lid",
+                        "phoneNumber": "554284348739@s.whatsapp.net",
+                        "admin": null
+                    }
+                ],
+                "action": "add"
+            },
+            "destination": "http://n8n-core:5678/webhook/651c501f-a6bf-4a10-be2b-7af13cf37d39",
+            "date_time": "2025-11-01T23:45:09.772Z",
+            "sender": "5511967308190@s.whatsapp.net",
+            "server_url": "http://localhost:8080",
+            "apikey": "60D4A3985E55-446A-A3A4-5C224F32F1B7"
+        },
+        "webhookUrl": "http://localhost:5678/webhook/651c501f-a6bf-4a10-be2b-7af13cf37d39",
+        "executionMode": "production"
+    }
+]
