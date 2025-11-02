@@ -1,0 +1,286 @@
+{
+  "name": "Welcome Message on Group Join",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "651c501f-a6bf-4a10-be2b-7af13cf37d39",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "6c4fdccf-1d76-458f-a644-4e3ce40bcd42",
+      "name": "Webhook",
+      "webhookId": "651c501f-a6bf-4a10-be2b-7af13cf37d39"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "283c2826-a3a0-420e-86de-a665400cc7e0",
+              "name": "event",
+              "value": "={{ $json.body.event }}",
+              "type": "string"
+            },
+            {
+              "id": "3cdce0c4-ba47-4309-923d-8d626a38fba8",
+              "name": "instance",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "765aa3a4-1629-43df-9adb-ae64a2bf0bf5",
+              "name": "group_id",
+              "value": "={{ $json.body.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3a7769d5-6b27-46f6-9d6d-4c696f17aacd",
+              "name": "action",
+              "value": "={{ $json.body.data.action }}",
+              "type": "string"
+            },
+            {
+              "id": "8fa9987f-055e-452c-9387-86e33c87e47a",
+              "name": "participants",
+              "value": "={{ $json.body.data.participants }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -48
+      ],
+      "id": "9dcfdfb0-6fc8-48af-9e41-0cbd75b6506b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        528,
+        128
+      ],
+      "id": "d5712fb4-ce41-4529-84da-534833077dae",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f919f69b-f815-490a-857d-d1e5647d70f6",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "=group-participants.update",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c070f2d7-1f08-4627-ad40-268af5923286",
+              "leftValue": "={{ $json.instance }}",
+              "rightValue": "=+11967308190",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "71ae1ddd-5343-46fc-8ea1-c3a9644942c7",
+              "leftValue": "={{ $json.group_id }}",
+              "rightValue": "=120363405226577317@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c7acee76-2b88-403a-a6c7-0a0d8e73cb2b",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "=add",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -48
+      ],
+      "id": "357b2d62-c05d-4cd1-9944-904d5a995b21",
+      "name": "user_joined_group"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Edit Fields').item.json.instance }}",
+        "remoteJid": "={{ $('Edit Fields').item.json.group_id }}",
+        "messageText": "={{ [\"🤖💻 Bem-vindo ao grupo! 🎉\\n\\nAqui a gente programa com IA e muita vibe!\\n\\nBora codar junto! 🚀✨\", \"👨‍💻🔥 Opa! Chegou mais um dev! 🎊\\n\\nBem-vindo ao nosso lab de IA e vibecoding!\\n\\nPrepara o setup! ⚡🖥️\", \"🧠✨ Olha quem entrou no grupo! 🎉\\n\\nBem-vindo!\\n\\nAqui a gente mistura código, IA e muita energia boa! 💡🚀\", \"🎯💫 Bem-vindo ao melhor grupo de vibecoding! 🤖\\n\\nVamos criar projetos incríveis com IA!\\n\\nLet's go! 🔥👾\", \"⚡🌟 Chegou mais um maker! 🎉\\n\\nBem-vindo!\\n\\nAqui é IA, código e vibe no talo!\\n\\nBora buildar! 🛠️💻\", \"🚀🤖 Welcome aboard! 🎊\\n\\nAqui a gente programa ao vivo com IA e muita vibração!\\n\\nAproveite! 🎥✨\", \"💡🔮 Olha quem apareceu! 🎉\\n\\nBem-vindo ao grupo!\\n\\nPrepare-se para muito código, IA e projetos massa! 🏗️💫\", \"🎮👾 Novo player no servidor! 🎉\\n\\nBem-vindo!\\n\\nAqui é vibecoding, IA e projetos públicos!\\n\\nGG! 🏆🔥\", \"🌈💻 Bem-vindo ao nosso hub de IA! ✨\\n\\nAqui a gente constrói, aprende e compartilha conhecimento!\\n\\n🧠🚀\", \"🔥⚡ Aeee! Mais um builder chegou! 🎉\\n\\nBem-vindo!\\n\\nVamos codar ao vivo e criar magia com IA! 🪄💫\", \"🎨🤖 Bem-vindo ao grupo! 🎊\\n\\nAqui misturamos arte, código e IA!\\n\\nBora vibrar junto nessa jornada! 🌟💻\", \"⭐🧪 Olha quem entrou no lab! 🎉\\n\\nBem-vindo!\\n\\nAqui experimentamos, codamos e evoluímos com IA! 🔬🚀\", \"💫🎯 Chegou mais um! 🎉\\n\\nBem-vindo ao nosso espaço de vibecoding!\\n\\nVamos buildar projetos insanos! 🏗️🔥\", \"🌊💙 Surfando a onda da IA! 🏄‍♂️\\n\\nBem-vindo ao grupo!\\n\\nAqui é código, flow e muita criatividade! ✨💻\", \"🎪🤹 Bem-vindo ao circo do código! 🎉\\n\\nAqui fazemos mágica com IA e vibecoding!\\n\\nSenta que lá vem! 🎭⚡\", \"🏗️🔧 Novo construtor no canteiro! 🎉\\n\\nBem-vindo!\\n\\nVamos buildar projetos com IA e boa energia! 💪✨\", \"🌌🛸 Bem-vindo à nave! 🚀\\n\\nAqui exploramos o universo da IA programando ao vivo!\\n\\nDecola com a gente! 🌟💫\", \"🎬🎥 Action! 🎉\\n\\nBem-vindo ao grupo!\\n\\nAqui codamos em público, com IA e muita autenticidade! 📹🔥\", \"🧩💡 Peça nova no quebra-cabeça! 🎉\\n\\nBem-vindo!\\n\\nVamos resolver problemas com IA e código! 🤖✨\", \"🎸🎵 Bem-vindo à banda! 🎉\\n\\nAqui tocamos o código com ritmo, IA e vibecoding!\\n\\nLet's rock! 🎶💻\"][Math.floor(Math.random() * 20)] + \"\\n\\n━━━━━━━━━━━━━━━\\n\\n🎯 Você é o participante \" + $json.data.participants.length + \"/100 ✨\" }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -64
+      ],
+      "id": "c0067b8e-a96f-43b6-ba62-dac5967497d9",
+      "name": "Enviar texto1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "XzafVPiOPRl4B7k2",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "groups-api",
+        "operation": "find-participants",
+        "instanceName": "={{ $json.instance }}",
+        "groupJid": "={{ $json.group_id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -64
+      ],
+      "id": "f829f663-0a9d-423e-bf5c-56da3217737e",
+      "name": "Encontrar participantes do grupo",
+      "credentials": {
+        "evolutionApi": {
+          "id": "XzafVPiOPRl4B7k2",
+          "name": "Evolution account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "user_joined_group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "user_joined_group": {
+      "main": [
+        [
+          {
+            "node": "Encontrar participantes do grupo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar texto1": {
+      "main": [
+        []
+      ]
+    },
+    "Encontrar participantes do grupo": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "user-agent": "axios/1.12.2",
+          "content-length": "479",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "n8n-core:5678",
+          "connection": "keep-alive"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "event": "group-participants.update",
+          "instance": "+11967308190",
+          "data": {
+            "id": "120363405226577317@g.us",
+            "author": null,
+            "participants": [
+              {
+                "id": "13026753294427@lid",
+                "phoneNumber": "554499424823@s.whatsapp.net",
+                "admin": null
+              }
+            ],
+            "action": "add"
+          },
+          "destination": "http://n8n-core:5678/webhook/651c501f-a6bf-4a10-be2b-7af13cf37d39",
+          "date_time": "2025-11-02T00:30:25.622Z",
+          "sender": "5511967308190@s.whatsapp.net",
+          "server_url": "http://localhost:8080",
+          "apikey": "60D4A3985E55-446A-A3A4-5C224F32F1B7"
+        },
+        "webhookUrl": "http://localhost:5678/webhook/651c501f-a6bf-4a10-be2b-7af13cf37d39",
+        "executionMode": "production"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "11389e8fa9fa3e18219ee91948d37febcef4a866018652d9bf97ce794a10c174"
+  }
+}
